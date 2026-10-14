@@ -1,0 +1,756 @@
+diff --git a/index.html b/index.html
+new file mode 100644
+index 0000000..8861e8f
+--- /dev/null
++++ b/index.html
+@@ -0,0 +1,32 @@
++<!doctype html>
++<html lang="en">
++    <head>
++        <meta charset="utf-8" />
++        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
++        <meta name="viewport" content="width=device-width,initial-scale=1.0" />
++        <title>Mainsail</title>
++        <meta name="description" content="Mainsail is the popular web interface for Klipper." />
++
++        <link rel="icon" type="image/png" sizes="32x32" href="/img/icons/favicon-32x32.png" />
++        <link rel="icon" type="image/png" sizes="16x16" href="/img/icons/favicon-16x16.png" />
++        <meta name="theme-color" content="#121212" />
++        <meta name="mobile-web-app-capable" content="yes" />
++        <meta name="apple-mobile-web-app-capable" content="yes" />
++        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
++        <meta name="apple-mobile-web-app-title" content="Mainsail" />
++        <link rel="apple-touch-icon" sizes="180x180" href="/img/icons/apple-touch-icon-180x180.png" />
++        <link rel="mask-icon" href="img/icons/safari-pinned-tab.svg" color="#d51f26" />
++        <meta name="msapplication-TileImage" content="/img/icons/mstile-150x150.png" />
++        <meta name="msapplication-TileColor" content="#d51f26" />
++
++        <script type="module" src="/src/main.ts"></script>
++    </head>
++    <body style="background-color: #121212">
++        <noscript>
++            <strong>
++                We're sorry but Mainsail doesn't work properly without JavaScript enabled. Please enable it to continue.
++            </strong>
++        </noscript>
++        <div id="app"></div>
++    </body>
++</html>
+diff --git a/public/css/themes/woloongforge.css b/public/css/themes/woloongforge.css
+new file mode 100644
+index 0000000..5de4e44
+--- /dev/null
++++ b/public/css/themes/woloongforge.css
+@@ -0,0 +1,245 @@
++/* Woloong Forge Theme - Custom Styles */
++
++/* ===== 1. 增大 Topbar Logo 并缩小到最小间距 ===== */
++.topbar .nav-logo {
++    height: 48px !important;
++    width: auto !important;
++    margin-right: 0px !important;
++    margin-left: 2px !important;
++}
++
++/* 缩小 Logo 和标题之间的间距到最小 */
++.topbar a[router-link] {
++    margin-right: 0px !important;
++    padding-right: 0px !important;
++}
++
++.topbar .v-toolbar__title {
++    margin-left: 2px !important;
++    padding-left: 0px !important;
++}
++
++/* 移除顶部栏可能存在的额外间距 */
++.topbar .v-toolbar__content {
++    padding-left: 4px !important;
++}
++
++/* ===== 2. 增大 Sidebar Logo ===== */
++.v-navigation-drawer .nav-logo {
++    height: 42px !important;
++    width: auto !important;
++}
++
++/* ===== 3. 增强 Sidebar 科技感 + 导航按钮悬浮感 ===== */
++.v-navigation-drawer {
++    border-right: 1px solid rgba(252, 0, 0, 0.15) !important;
++}
++
++/* 导航按钮默认状态：完全不透明实心背景 */
++.v-navigation-drawer .v-list-item {
++    margin: 4px 8px !important;
++    border-radius: 6px !important;
++    border: 1px solid rgba(252, 0, 0, 0.15) !important;
++    background: rgba(35, 35, 55, 0.98) !important;
++    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
++    transition: all 0.25s ease !important;
++}
++
++/* 导航按钮悬停状态：更强悬浮感 */
++.v-navigation-drawer .v-list-item:hover {
++    background: rgba(50, 35, 45, 0.98) !important;
++    border-color: rgba(252, 0, 0, 0.45) !important;
++    box-shadow: 0 6px 18px rgba(252, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
++    transform: translateX(4px) translateY(-1px) !important;
++}
++
++/* 导航按钮激活状态：高亮度科技感 */
++.v-navigation-drawer .v-list-item--active {
++    background: linear-gradient(90deg, rgba(252, 0, 0, 0.35) 0%, rgba(80, 35, 45, 0.98) 100%) !important;
++    border-left: 3px solid #fc0000 !important;
++    border-color: rgba(252, 0, 0, 0.5) !important;
++    box-shadow: 0 0 20px rgba(252, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
++}
++
++/* 激活状态悬停：更强亮度 */
++.v-navigation-drawer .v-list-item--active:hover {
++    background: linear-gradient(90deg, rgba(252, 0, 0, 0.45) 0%, rgba(90, 40, 50, 0.98) 100%) !important;
++    box-shadow: 0 0 24px rgba(252, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
++}
++
++/* 导航按钮图标默认状态 */
++.v-navigation-drawer .v-list-item .v-icon {
++    color: rgba(255, 255, 255, 0.75) !important;
++    transition: all 0.25s ease !important;
++}
++
++/* 导航按钮图标悬停状态 */
++.v-navigation-drawer .v-list-item:hover .v-icon {
++    color: rgba(252, 0, 0, 0.95) !important;
++    text-shadow: 0 0 10px rgba(252, 0, 0, 0.6) !important;
++    transform: scale(1.15) !important;
++}
++
++/* 导航按钮文字默认状态 */
++.v-navigation-drawer .v-list-item__title {
++    color: rgba(255, 255, 255, 0.85) !important;
++    transition: all 0.25s ease !important;
++}
++
++/* 导航按钮文字悬停状态 */
++.v-navigation-drawer .v-list-item:hover .v-list-item__title {
++    color: #ffffff !important;
++}
++
++/* 激活状态图标：更亮 */
++.v-navigation-drawer .v-list-item--active .v-icon {
++    color: #ff3333 !important;
++    text-shadow: 0 0 10px rgba(252, 0, 0, 0.7) !important;
++}
++
++/* 激活状态文字：更亮更白 */
++.v-navigation-drawer .v-list-item--active .v-list-item__title {
++    color: #ffffff !important;
++    font-weight: 700 !important;
++    text-shadow: 0 0 4px rgba(255, 255, 255, 0.3) !important;
++}
++
++/* ===== 4. 增强按钮科技感 ===== */
++.v-btn.primary {
++    background: linear-gradient(135deg, #fc0000 0%, #cc0000 100%) !important;
++    box-shadow: 0 0 8px rgba(252, 0, 0, 0.3) !important;
++}
++
++.v-btn.primary:hover {
++    background: linear-gradient(135deg, #ff3333 0%, #ff0000 100%) !important;
++    box-shadow: 0 0 12px rgba(252, 0, 0, 0.5) !important;
++}
++
++/* ===== 5. 面板卡片科技感 ===== */
++.v-card {
++    border: 1px solid rgba(252, 0, 0, 0.12) !important;
++    box-shadow: 0 0 4px rgba(252, 0, 0, 0.05) !important;
++}
++
++.v-card__title {
++    border-bottom: 1px solid rgba(252, 0, 0, 0.15) !important;
++}
++
++.v-card:hover {
++    border-color: rgba(252, 0, 0, 0.2) !important;
++    box-shadow: 0 0 8px rgba(252, 0, 0, 0.1) !important;
++}
++
++/* 面板工具栏图标发光 */
++.panel-toolbar .v-btn--icon {
++    color: rgba(252, 0, 0, 0.85) !important;
++}
++
++.panel-toolbar .v-btn--icon:hover {
++    color: #fc0000 !important;
++    text-shadow: 0 0 8px rgba(252, 0, 0, 0.5) !important;
++}
++
++/* 温度图标发光 */
++.temperature-icon {
++    filter: drop-shadow(0 0 2px rgba(252, 0, 0, 0.3));
++}
++
++/* 侧边栏选中项图标发光 */
++.v-navigation-drawer .v-list-item--active .v-icon {
++    color: #fc0000 !important;
++    text-shadow: 0 0 6px rgba(252, 0, 0, 0.6) !important;
++}
++
++/* 输入框聚焦时红色边框 */
++.v-text-field--outlined fieldset {
++    border-color: rgba(252, 0, 0, 0.15) !important;
++}
++.v-text-field--outlined.v-input--is-focused fieldset {
++    border-color: rgba(252, 0, 0, 0.5) !important;
++    box-shadow: 0 0 4px rgba(252, 0, 0, 0.2) !important;
++}
++
++/* 表格悬停行红色 */
++.v-data-table tbody tr:hover {
++    background: rgba(252, 0, 0, 0.05) !important;
++}
++
++/* 芯片标签红色发光 */
++.v-chip.primary {
++    box-shadow: 0 0 6px rgba(252, 0, 0, 0.3) !important;
++}
++
++/* 开关激活红色 */
++.v-input--switch .v-input--switch__track.theme--dark {
++    color: rgba(252, 0, 0, 0.5) !important;
++}
++
++/* 滑块红色 */
++.v-slider__thumb {
++    border-color: #fc0000 !important;
++    box-shadow: 0 0 6px rgba(252, 0, 0, 0.5) !important;
++}
++.v-slider__track-fill {
++    background: #fc0000 !important;
++}
++
++/* 进度条红色发光 */
++.v-progress-linear {
++    box-shadow: 0 0 4px rgba(252, 0, 0, 0.2) !important;
++}
++.v-progress-linear__determinate {
++    filter: drop-shadow(0 0 2px rgba(252, 0, 0, 0.5)) !important;
++}
++
++/* 顶部栏红色边框线 */
++.topbar {
++    border-bottom: 1px solid rgba(252, 0, 0, 0.25) !important;
++    box-shadow: 0 0 8px rgba(252, 0, 0, 0.1) !important;
++}
++
++/* 通知图标红色 */
++.v-btn .v-icon.mdi-bell {
++    color: rgba(252, 0, 0, 0.8) !important;
++}
++
++/* 设置图标红色 */
++.v-btn .v-icon.mdi-cog {
++    color: rgba(252, 0, 0, 0.8) !important;
++}
++
++/* 面板图标红色 */
++.panel-icon {
++    color: rgba(252, 0, 0, 0.9) !important;
++}
++
++/* ===== 6. Sidebar 底部 Logo 匀速弹跳动画 ===== */
++.v-navigation-drawer::after {
++    content: "";
++    position: absolute;
++    width: 180px;
++    height: 101px;
++    background-image: url('/img/themes/sidebarLogo-woloongforge.png');
++    background-size: contain;
++    background-repeat: no-repeat;
++    background-position: center;
++    opacity: 0.35;
++    pointer-events: none;
++    z-index: 0;
++    /* 60秒完成一圈，linear匀速，全程速度一致 */
++    animation: logoBounce 60s linear infinite;
++}
++
++/* Logo 匀速反弹动画 — 按实际像素距离分配时间，确保横向/纵向速度一致 */
++@keyframes logoBounce {
++    /* 起点：左上 */
++    0%   { top: 45%; left: 0%; }
++    /* 向右匀速移动 (40px / 629px ≈ 6.4% 时间) */
++    6.4% { top: 45%; left: 18%; }
++    /* 碰到右边界，反弹向下 (275px / 629px ≈ 43.6% 时间) */
++    50%  { top: 80%; left: 18%; }
++    /* 碰到下边界，瞬间反弹向左 */
++    56.4%{ top: 80%; left: 0%; }
++    /* 碰到左边界，瞬间反弹向上，回到起点 */
++    100% { top: 45%; left: 0%; }
++}
+diff --git a/public/img/themes/mainBackground-woloongforge.png b/public/img/themes/mainBackground-woloongforge.png
+new file mode 100644
+index 0000000..224bcff
+Binary files /dev/null and b/public/img/themes/mainBackground-woloongforge.png differ
+diff --git a/public/img/themes/sidebarBackground-woloongforge.png b/public/img/themes/sidebarBackground-woloongforge.png
+new file mode 100644
+index 0000000..0197e6a
+Binary files /dev/null and b/public/img/themes/sidebarBackground-woloongforge.png differ
+diff --git a/public/img/themes/sidebarLogo-woloongforge.png b/public/img/themes/sidebarLogo-woloongforge.png
+new file mode 100644
+index 0000000..612bd86
+Binary files /dev/null and b/public/img/themes/sidebarLogo-woloongforge.png differ
+diff --git a/src/components/mixins/theme.ts b/src/components/mixins/theme.ts
+new file mode 100644
+index 0000000..31c8e05
+--- /dev/null
++++ b/src/components/mixins/theme.ts
+@@ -0,0 +1,101 @@
++import Vue from 'vue'
++import Component from 'vue-class-component'
++
++@Component
++export default class ThemeMixin extends Vue {
++    protected fgColor(alpha: number = 1, dark: boolean = this.$vuetify.theme.dark): string {
++        const base = dark ? 255 : 0
++        return `rgba(${base}, ${base}, ${base}, ${alpha})`
++    }
++
++    protected bgColor(alpha: number = 1) {
++        return this.fgColor(alpha, !this.$vuetify.theme.dark)
++    }
++
++    get themeName() {
++        return this.$store.getters['gui/theme']
++    }
++
++    get theme() {
++        return this.$store.getters['gui/getTheme']
++    }
++
++    get themeMode() {
++        return this.$store.state.gui.uiSettings.mode ?? 'dark'
++    }
++
++    get fgColorHi() {
++        return this.fgColor(0.8)
++    }
++
++    get fgColorMid() {
++        return this.fgColor(0.5)
++    }
++
++    get fgColorLow() {
++        return this.fgColor(0.2)
++    }
++
++    get fgColorFaint() {
++        return this.fgColor(0.1)
++    }
++
++    get machineButtonCol() {
++        return this.$vuetify.theme.dark ? 'grey darken-3' : 'grey lighten-1'
++    }
++
++    get draggableBgStyle() {
++        const col = this.$vuetify.theme.dark ? '#282828' : '#e7e7e7'
++        return `background-color: ${col}`
++    }
++
++    get progressBarColor() {
++        return this.$vuetify.theme.dark ? 'white' : 'primary'
++    }
++
++    get sidebarBgImage() {
++        if (this.theme.sidebarBackground?.show) {
++            if (this.theme.sidebarBackground?.light && this.themeMode === 'light')
++                return `/img/themes/sidebarBackground-${this.themeName}-light.png`
++
++            return `/img/themes/sidebarBackground-${this.themeName}.png`
++        }
++
++        return this.$vuetify.theme.dark ? '/img/sidebar-background.svg' : '/img/sidebar-background-light.svg'
++    }
++
++    get sidebarLogo(): string {
++        const url = this.$store.getters['files/getSidebarLogo']
++        if (url !== '' || this.themeName === 'mainsail') return url
++
++        // if no theme is set, return empty string to load the default logo
++        if (!(this.theme.logo?.show ?? false)) return ''
++
++        const logoExt = this.theme.logoExtension ?? 'svg'
++
++        // return light logo if theme is light and sidebarLogo is set to both
++        if (this.theme.logo?.light && this.themeMode === 'light')
++            return `/img/themes/sidebarLogo-${this.themeName}-light.${logoExt}`
++
++        // return dark/generic theme logo
++        return `/img/themes/sidebarLogo-${this.themeName}.${logoExt}`
++    }
++
++    get mainBgImage() {
++        const url = this.$store.getters['files/getMainBackground']
++        if (url || this.themeName === 'mainsail') return url
++
++        if (!this.theme.mainBackground?.show) return null
++
++        if (this.theme.mainBackground?.light && this.themeMode === 'light')
++            return `/img/themes/mainBackground-${this.themeName}-light.png`
++
++        return `/img/themes/mainBackground-${this.themeName}.png`
++    }
++
++    get themeCss() {
++        if (!(this.theme.css ?? false)) return null
++
++        return `/css/themes/${this.themeName}.css`
++    }
++}
+diff --git a/src/store/types.ts b/src/store/types.ts
+new file mode 100644
+index 0000000..93c78b1
+--- /dev/null
++++ b/src/store/types.ts
+@@ -0,0 +1,68 @@
++import { SocketState } from '@/store/socket/types'
++import { ServerState } from '@/store/server/types'
++import { PrinterState } from '@/store/printer/types'
++import { GuiState } from '@/store/gui/types'
++import { EditorState } from '@/store/editor/types'
++
++export interface RootState {
++    packageVersion: string
++    debugMode: boolean
++    naviDrawer: boolean | null
++    instancesDB: 'moonraker' | 'browser' | 'json'
++    configInstances: ConfigJsonInstance[]
++
++    socket?: SocketState
++    gui?: GuiState
++    printer?: PrinterState
++    server?: ServerState
++    editor?: EditorState
++}
++
++export interface RootStateDependency {
++    serviceName: string
++    installedVersion: string
++    neededVersion: string
++}
++
++export interface ConfigJson {
++    defaultTheme?: 'dark' | 'light'
++    hostname?: string | null
++    port?: string | number | null
++    path?: string | null
++    instancesDB?: 'moonraker' | 'browser' | 'json'
++    instances?: ConfigJsonInstance[]
++}
++
++export interface ConfigJsonInstance {
++    hostname: string
++    port?: number
++    path?: string
++}
++
++export interface Theme {
++    name: string
++    displayName: string
++    colorLogo: string
++    colorPrimary?: string
++    logo?: {
++        show: boolean
++        light: boolean
++    }
++    logoExtension?: string
++    sidebarBackground?: {
++        show: boolean
++        light: boolean
++    }
++    mainBackground?: {
++        show: boolean
++        light: boolean
++    }
++    css?: boolean
++}
++
++export interface KlipperRepos {
++    [name: string]: {
++        url: string
++        docsLanguages?: string[]
++    }
++}
+diff --git a/src/store/variables.ts b/src/store/variables.ts
+new file mode 100644
+index 0000000..28c990b
+--- /dev/null
++++ b/src/store/variables.ts
+@@ -0,0 +1,268 @@
++import { KlipperRepos, Theme } from '@/store/types'
++
++export const defaultMode = 'dark'
++export const defaultTheme = 'woloongforge'
++export const defaultLogoColor = '#fc0000'
++export const defaultPrimaryColor = '#fc0000'
++export const defaultBigThumbnailBackground = '#1e1e1e'
++
++export const minKlipperVersion = 'v0.11.0-257'
++
++export const minMoonrakerVersion = 'v0.8.0-306'
++export const minBrowserVersions = [{ name: 'safari', version: '16.5.2' }]
++
++export const colorArray = ['#F44336', '#8e379d', '#03DAC5', '#3F51B5', '#ffde03', '#009688', '#E91E63']
++
++export const colorHeaterBed = '#2196F3'
++export const colorChamber = '#4CAF50'
++export const opacityHeaterActive = '99'
++export const opacityHeaterInactive = '44'
++export const themeDir = '.theme'
++export const datasetInterval = 1000
++export const datasetTypes = ['temperature', 'target', 'power', 'speed']
++export const datasetTypesInPercents = ['power', 'speed']
++export const additionalSensors = [
++    'aht10',
++    'aht1x',
++    'aht2x',
++    'aht3x',
++    'bme280',
++    'htu21d',
++    'sgp40',
++    'sht3x',
++    'sht4x',
++    'temperature_combined',
++]
++
++/*
++ * List of valid gcode file extensions
++ */
++export const validGcodeExtensions = ['.gcode', '.g', '.gco', '.ufp', '.nc']
++
++/*
++ * List of initable server components
++ */
++export const initableServerComponents = [
++    'history',
++    'power',
++    'updateManager',
++    'timelapse',
++    'jobQueue',
++    'announcements',
++    'spoolman',
++    'sensor',
++]
++
++/*
++ * List of required klipper config modules
++ */
++export const checkKlipperConfigModules = [
++    'virtual_sdcard',
++    'pause_resume',
++    'gcode_macro pause',
++    'gcode_macro resume',
++    'gcode_macro cancel_print',
++]
++
++/*
++ * List of allowed metadata fields
++ */
++export const allowedMetadata = [
++    'uuid',
++    'estimated_time',
++    'extruder_colors',
++    'filament_change_count',
++    'filament_colors',
++    'filament_name',
++    'filament_temps',
++    'filament_type',
++    'filament_colors',
++    'extruder_colors',
++    'filament_temps',
++    'referenced_tools',
++    'mmu_print',
++    'filament_total',
++    'filament_weight_total',
++    'filament_weights',
++    'nozzle_diameter',
++    'first_layer_bed_temp',
++    'first_layer_extr_temp',
++    'chamber_temp',
++    'first_layer_height',
++    'gcode_end_byte',
++    'gcode_start_byte',
++    'job_id',
++    'layer_height',
++    'mmu_print',
++    'object_height',
++    'print_start_time',
++    'referenced_tools',
++    'size',
++    'slicer',
++    'slicer_version',
++    'thumbnails',
++]
++
++export const maxEventHistory = 500
++export const maxGcodeHistory = 50
++
++/*
++ * List of generic dashboard panels
++ */
++export const allDashboardPanels = [
++    'afc',
++    'toolhead-control',
++    'extruder-control',
++    'macros',
++    'led-effects',
++    'machine-settings',
++    'miniconsole',
++    'miscellaneous',
++    'spoolman',
++    'mmu',
++    'temperature',
++    'webcam',
++]
++
++export const thumbnailSmallMin = 30
++export const thumbnailSmallMax = 64
++export const thumbnailBigMin = 128
++
++export const navigationWidth = 220
++export const navigationItemHeight = 48
++export const panelToolbarHeight = 48
++export const topbarHeight = 48
++
++/*
++ * List of hidden timelapse console outputs
++ */
++export const timelapseConsoleFilters = [
++    '^_TIMELAPSE_NEW_FRAME',
++    '^TIMELAPSE_TAKE_FRAME',
++    '^TIMELAPSE_RENDER',
++    '^_SET_TIMELAPSE_SETUP',
++    '^HYPERLAPSE ACTION=',
++    '^SET_GCODE_VARIABLE MACRO=TIMELAPSE_',
++]
++
++/*
++ * List of hidden root directories in config files panel
++ */
++export const hiddenRootDirectories = ['gcodes', 'timelapse', 'timelapse_frames']
++
++/*
++ * Hide directories
++ */
++export const hiddenDirectories = ['.git']
++
++/*
++ * List of all downloadable logfiles
++ */
++export const genericLogfiles = ['klippy', 'moonraker', 'crowsnest', 'mmu', 'sonar']
++
++/*
++ * List of all rollover logfiles
++ */
++export const rolloverLogfiles = ['klipper', 'moonraker']
++
++/*
++ * List of keys that should not be saved to Moonraker DB
++ * and are excluded when backup/restore settings
++ */
++export const excludeKeys = [
++    'view.timelapse.currentPath',
++    'view.timelapse.selectedFiles',
++    'view.history.selectedJobs',
++    'view.blockFileUpload',
++    'view.configfiles.selectedFiles',
++    'view.configfiles.rootPath',
++    'view.configfiles.currentPath',
++    'view.gcodefiles.search',
++    'view.gcodefiles.currentPath',
++    'view.gcodefiles.selectedFiles',
++]
++
++/*
++ * List of all Themes
++ */
++export const themes: Theme[] = [
++    { name: 'mainsail', displayName: 'Mainsail', colorLogo: '#D41216' },
++    {
++        name: 'klipper',
++        displayName: 'Klipper',
++        colorLogo: '#b12f35',
++        logo: { show: true, light: false },
++    },
++    {
++        name: 'voron',
++        displayName: 'Voron Design',
++        colorLogo: '#FF2300',
++        logo: { show: true, light: false },
++    },
++    {
++        name: 'ldo',
++        displayName: 'LDO Motion (Sponsor)',
++        colorLogo: '#326799',
++        colorPrimary: '#326799',
++        logo: { show: true, light: false },
++    },
++    {
++        name: 'yumi',
++        displayName: 'YUMI (Sponsor)',
++        colorLogo: '#F6CF3D',
++        colorPrimary: '#F6CF3D',
++        logo: { show: true, light: false },
++    },
++    {
++        name: 'vzbot',
++        displayName: 'VzBot',
++        colorLogo: '#FF0000',
++        logo: { show: true, light: false },
++        sidebarBackground: { show: true, light: false },
++        css: true,
++    },
++    {
++        name: 'prusa',
++        displayName: 'Prusa Research (Sponsor)',
++        colorLogo: '#fa6831',
++        colorPrimary: '#fa6831',
++        logo: { show: true, light: false },
++    },
++    {
++        name: 'btt',
++        displayName: 'BigTreeTech (Sponsor)',
++        colorLogo: '#ef0025',
++        logo: { show: true, light: false },
++    },
++    {
++        name: 'multec',
++        displayName: 'Multec GmbH (Sponsor)',
++        colorLogo: '#234D7A',
++        colorPrimary: '#234D7A',
++        logo: { show: true, light: false },
++    },
++    {
++        name: 'woloongforge',
++        displayName: 'Woloong Forge',
++        colorLogo: '#fc0000',
++        colorPrimary: '#fc0000',
++        logo: { show: true, light: false },
++        logoExtension: 'png',
++        sidebarBackground: { show: true, light: false },
++        mainBackground: { show: true, light: false },
++        css: true,
++    },
++]
++
++/*
++ * List of all supported Klipper-Repos
++ */
++export const klipperRepos: KlipperRepos = {
++    Klipper: {
++        url: 'https://www.klipper3d.org/',
++        docsLanguages: ['it', 'hu', 'zh'],
++    },
++    Kalico: {
++        url: 'https://docs.kalico.gg/',
++    },
++}
