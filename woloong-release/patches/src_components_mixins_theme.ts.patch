@@ -1,5 +1,5 @@
---- woloong-release/baseline/src/components/mixins/theme.ts	2026-10-14 20:26:55.530847900 +0800
-+++ src/components/mixins/theme.ts	2026-07-09 10:09:38.486719000 +0800
+--- a/src/components/mixins/theme.ts
++++ b/src/components/mixins/theme.ts
 @@ -71,12 +71,14 @@
          // if no theme is set, return empty string to load the default logo
          if (!(this.theme.logo?.show ?? false)) return ''
