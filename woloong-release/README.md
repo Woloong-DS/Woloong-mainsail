@@ -19,6 +19,14 @@
 | `patches/` | 逐文件统一差异补丁（共 85 行） |
 | `tools/verify-assets.sh` | 按清单校验定制完整性 |
 
+## dist（构建产物）的发布方式 —— 已裁决：不进 git
+
+品牌前端 `dist/`（197 文件）**不纳入 git 跟踪**，而是作为**发行 tag 的 Release 资产**发布：
+`mainsail-dist-woloong-1.0.0.zip`（3.0 MB）。设备/镜像从 Release 取用；
+其关键标记哈希记录在 `assets.manifest.json` 的 `build_artifacts.markers` 中。
+
+重新构建：在仓库根 `npm ci && npm run build`（或从 `Mainsail_Theme_Woloong/dist` 取现成产物）→ 打包为 zip → 上传到对应 tag 的 Release。
+
 ## 吸收上游更新（重新叠加）
 
 1. 取官方新版（如 v2.19.x）源码；2. 用其整体替换工作区（保留 `.git/`、`woloong-release/`、`Mainsail_Theme_Woloong/`）；
