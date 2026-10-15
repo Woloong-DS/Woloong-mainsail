@@ -1,26 +1,29 @@
 # ============================================================================
-# upstream-sync —— 吸收上游官方新版，重放 woloong 定制，构建并发布（D20 发行树）
+# upstream-sync —— 吸收上游官方新版 → 重放 woloong 定制 → 门禁 → 发布（D20 发行树）
 #
-# 与 klipperscreen 同一套机制，差异：mainsail 是前端工程，必须**构建**（vite），
-#   故本工作流额外：setup-node → npm ci → vite build → 校验产物含 woloongforge
-#   → 打包 dist 为 Release 资产（dist 不进 git，作为资产发布 ✓）
-#
-# 不漏版本：weekly schedule 自动检测 + 差异审计逐版本列出 + 漂移自动开 Issue（去重）
+# 自动闭环：
+#   · 每周定时审计（check-upstream）→ 落后才继续
+#   · 重叠加（fork-sync：上游树替换 → 重放定制 → 应用 remove.list → 更新 upstream.json）
+#   · 门禁：定制资产完整性 + 构建产物含定制（不过则不发布）
+#   · 构建：npm ci + vite build；dist 作为 Release 资产（不进 git）
+#   · 发布：tag = woloong-<上游 tag>（与上游版本一一对应）；推送 main 与 tag
+#   · 通知下游：若有 WOLOONG_DISPATCH_TOKEN 则 repository_dispatch 通知 Woloong-OS 跟进
+#   · 漂移/失败：自动开 Issue（去重），绝不静默遗漏
 # ============================================================================
 name: upstream-sync
 
 on:
   schedule:
-    - cron: '23 3 * * 1'
+    - cron: '23 3 * * 1'      # 每周一：审计上游新发布
   workflow_dispatch:
     inputs:
       upstream_ref:
-        description: '上游 ref（tag，例如 v2.19.0；留空=审计得到的最新）'
+        description: '上游 ref（留空=审计得到的最新）'
         required: false
         default: ''
         type: string
       next_tag:
-        description: '本次发布的 tag（例如 woloong-1.1.0）'
+        description: '本次发布 tag（留空=自动派生 woloong-<上游 tag>）'
         required: false
         default: ''
         type: string
@@ -32,6 +35,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   restack:
@@ -59,7 +63,7 @@ jobs:
           git remote add upstream https://github.com/mainsail-crew/mainsail.git || true
           git fetch upstream --tags --prune
 
-      - name: 上游版本审计（列出全部未吸收版本）
+      - name: 上游版本审计（逐版本列出，不漏）
         id: audit
         run: |
           set +e
@@ -74,13 +78,17 @@ jobs:
         if: steps.audit.outputs.behind == '0'
         run: echo '发行树已对应上游最新发布，无需动作 ✓'
 
-      - name: 重叠加（上游树替换 → 重放定制 → 应用移除清单）
+      - name: 重叠加（上游树替换 → 重放定制 → remove.list → 更新基线声明）
+        id: restack
         if: steps.audit.outputs.behind != '0'
         run: |
           set -uo pipefail
           REF='${{ inputs.upstream_ref }}'; [ -n "$REF" ] || REF='${{ steps.audit.outputs.latest }}'
-          ARGS=''; if [ -n '${{ inputs.next_tag }}' ]; then ARGS="--tag ${{ inputs.next_tag }}"; fi
-          bash woloong-release/tools/fork-sync.sh . --upstream-ref "$REF" $ARGS
+          TAG='${{ inputs.next_tag }}';  [ -n "$TAG" ] || TAG="woloong-$REF"
+          echo "ref=$REF" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "重叠加目标：上游 $REF → 我们的 tag $TAG"
+          bash woloong-release/tools/fork-sync.sh . --upstream-ref "$REF" --tag "$TAG"
 
       - name: 门禁 —— 定制资产完整性
         if: steps.audit.outputs.behind != '0'
@@ -92,7 +100,7 @@ jobs:
           set -euo pipefail
           npm ci --no-audit --no-fund
           npm run build
-          echo '--- dist 概览 ---'; du -sh dist; ls dist | head
+          du -sh dist; ls dist | head
 
       - name: 门禁 —— 定制是否进入构建产物
         if: steps.audit.outputs.behind != '0'
@@ -101,32 +109,47 @@ jobs:
           N=$(grep -rl 'woloongforge' dist/assets 2>/dev/null | wc -l)
           echo "产物中提及 woloongforge 的文件数: $N"
           [ "$N" -gt 0 ] || { echo '::error::构建产物中未发现 woloong 定制主题，拒绝发布'; exit 1; }
-          ls dist/img/themes | head -10
 
-      - name: 打包 Release 资产
+      - name: 打包 Release 资产（dist 不进 git）
+        id: pack
         if: steps.audit.outputs.behind != '0'
         run: |
           set -euo pipefail
-          TAG='${{ inputs.next_tag }}'; [ -n "$TAG" ] || TAG='woloong-1.1.0'
+          TAG='${{ steps.restack.outputs.tag }}'
           ( cd dist && zip -qr "mainsail-dist-$TAG.zip" . )
           ls -lh "dist/mainsail-dist-$TAG.zip"
           echo "asset=dist/mainsail-dist-$TAG.zip" >> "$GITHUB_OUTPUT"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-        id: pack
+          echo "sha256=$(sha256sum "dist/mainsail-dist-$TAG.zip" | cut -c1-64)" >> "$GITHUB_OUTPUT"
 
-      - name: 发布（tag + Release 资产）
+      - name: 发布（推送 main + tag + Release 资产）
         if: steps.audit.outputs.behind != '0' && inputs.do_push
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          TAG='${{ steps.pack.outputs.tag }}'
+          TAG='${{ steps.restack.outputs.tag }}'
           git push origin HEAD:main
           git tag -f "$TAG" >/dev/null 2>&1 || true
           git push -f origin "$TAG"
-          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "mainsail $TAG" --notes "上游 ${{ steps.audit.outputs.latest }} + woloong 定制（woloongforge 主题）"
+          echo "已推送 main 与 tag $TAG"
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "mainsail $TAG" --notes "上游 ${{ steps.restack.outputs.ref }} + woloong 定制"
           gh release upload "$TAG" '${{ steps.pack.outputs.asset }}' --clobber
-          echo "已发布 $TAG"
+          echo "已发布 Release $TAG（资产 mainsail-dist-$TAG.zip）"
+
+      - name: 通知 Woloong-OS 跟进（需 WOLOONG_DISPATCH_TOKEN 秘密；无则跳过）
+        if: steps.audit.outputs.behind != '0' && inputs.do_push
+        env:
+          TOKEN: ${{ secrets.WOLOONG_DISPATCH_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo '::notice::未配置 WOLOONG_DISPATCH_TOKEN —— 请手动在 Woloong-OS 执行：'
+            echo "  bash tools/sync-component-release.sh mainsail '${{ steps.restack.outputs.tag }}'"
+            exit 0
+          fi
+          curl -fsSL -X POST -H "Authorization: Bearer $TOKEN" -H 'Accept: application/vnd.github+json' \
+            https://api.github.com/repos/Woloong-DS/Woloong-OS/dispatches \
+            -d "{\"event_type\":\"component-released\",\"client_payload\":{\"component\":\"mainsail\",\"tag\":\"${{ steps.restack.outputs.tag }}\",\"ref\":\"${{ steps.restack.outputs.ref }}\"}}"
+          echo '已通知 Woloong-OS'
 
       - name: 漂移或失败 → 开 Issue（不遗漏）
         if: failure() && steps.audit.outputs.behind != '0'
@@ -135,7 +158,7 @@ jobs:
         run: |
           set -uo pipefail
           TITLE='上游发布待吸收（基线漂移，需人工重锚定）'
-          BODY=$(printf '上游最新：%s\n\n审计输出：\n```\n%s\n```\n\n处理：更新 woloong-release/baseline/<path> 为新的上游文件（注意：baseline 放**上游原版**，工作区放**定制版**）→ tools/make-patch.sh → 更新 assets.manifest.tsv 中该文件的哈希 → 提交后重跑。\n' \
+          BODY=$(printf '上游最新：%s\n\n审计输出：\n```\n%s\n```\n\n处理：更新 woloong-release/baseline/<path> 为新的**上游原版** → 工作区放**定制版** → tools/make-patch.sh → 更新 assets.manifest.tsv 中该文件的哈希 → 提交后重跑。\n' \
             '${{ steps.audit.outputs.latest }}' "$(tail -40 /tmp/audit.txt 2>/dev/null)")
           EXIST=$(gh issue list --state open --search "$TITLE" --json number -q '.[0].number' || true)
           if [ -n "$EXIST" ]; then gh issue comment "$EXIST" --body "$BODY"; else gh issue create --title "$TITLE" --body "$BODY"; fi
