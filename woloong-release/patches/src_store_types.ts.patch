@@ -1,0 +1,10 @@
+--- a/src/store/types.ts
++++ b/src/store/types.ts
+@@ -48,6 +48,7 @@
+         show: boolean
+         light: boolean
+     }
++    logoExtension?: string
+     sidebarBackground?: {
+         show: boolean
+         light: boolean
