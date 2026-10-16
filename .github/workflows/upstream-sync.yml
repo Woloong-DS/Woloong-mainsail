@@ -116,10 +116,25 @@ jobs:
         run: |
           set -euo pipefail
           TAG='${{ steps.restack.outputs.tag }}'
-          ( cd dist && zip -qr "mainsail-dist-$TAG.zip" . )
-          ls -lh "dist/mainsail-dist-$TAG.zip"
-          echo "asset=dist/mainsail-dist-$TAG.zip" >> "$GITHUB_OUTPUT"
-          echo "sha256=$(sha256sum "dist/mainsail-dist-$TAG.zip" | cut -c1-64)" >> "$GITHUB_OUTPUT"
+          # 固定资产名 mainsail.zip：Moonraker 的 zip 更新器按 release_info.json 的 asset_name 精确匹配；
+          # 同时把 asset_name 写进包内 release_info.json（版本仍取自 release 的 tag_name）。
+          python3 - "$TAG" <<'PY'
+          import json, pathlib, sys
+          tag = sys.argv[1]
+          p = pathlib.Path("dist/release_info.json")
+          d = json.loads(p.read_text(encoding='utf-8')) if p.is_file() else {}
+          d['version'] = tag
+          d['asset_name'] = 'mainsail.zip'
+          p.write_text(json.dumps(d, ensure_ascii=False) + '\n', encoding='utf-8')
+          print('release_info.json ->', d)
+          PY
+          # 先打固定名（保证它是第一个资产），再打带版本名的副本便于人工/审计
+          ( cd dist && zip -qr "mainsail.zip" . )
+          cp "dist/mainsail.zip" "dist/mainsail-dist-$TAG.zip"
+          ls -lh "dist/mainsail.zip" "dist/mainsail-dist-$TAG.zip"
+          echo "asset=dist/mainsail.zip" >> "$GITHUB_OUTPUT"
+          echo "asset_versioned=dist/mainsail-dist-$TAG.zip" >> "$GITHUB_OUTPUT"
+          echo "sha256=$(sha256sum "dist/mainsail.zip" | cut -c1-64)" >> "$GITHUB_OUTPUT"
 
       - name: 发布（推送 main + tag + Release 资产）
         if: steps.audit.outputs.behind != '0' && inputs.do_push
@@ -134,6 +149,7 @@ jobs:
           echo "已推送 main 与 tag $TAG"
           gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "mainsail $TAG" --notes "上游 ${{ steps.restack.outputs.ref }} + woloong 定制"
           gh release upload "$TAG" '${{ steps.pack.outputs.asset }}' --clobber
+          gh release upload "$TAG" '${{ steps.pack.outputs.asset_versioned }}' --clobber 2>/dev/null || true
           echo "已发布 Release $TAG（资产 mainsail-dist-$TAG.zip）"
 
       - name: 通知 Woloong-OS 跟进（把 sha/资产信息一并带过去，下游无需跨仓库权限）
