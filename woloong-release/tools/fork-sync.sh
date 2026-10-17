@@ -84,6 +84,9 @@ cp -a "$MAN" "$STAGE/__man"
 
 # 4) 上游树整体替换（保留 .git/）
 info "用上游树替换工作区"
+# ★ 2026-10-17：**先暂存我们自己的 .github/workflows**（上游整树替换会把它删掉 ✗，
+#   而我们的 upstream-sync/keepalive 不在上游树里 → 每次 restack 都会自我删除 ✗）
+if [ -d .github/workflows ]; then mkdir -p "$STAGE/__wf"; cp -a .github/workflows/. "$STAGE/__wf/" 2>/dev/null || true; info "已暂存 .github/workflows"; fi
 git rm -r --ignore-unmatch -q . || true
 # 关键：先恢复 .gitattributes，使随后的检出按 eol=lf 写入（否则会被 CRLF 化）
 if [ -f "$STAGE/.gitattributes" ]; then cp -p "$STAGE/.gitattributes" .gitattributes; info "已恢复 .gitattributes（LF 规则生效）"; fi
@@ -96,6 +99,8 @@ fi
 info "恢复发行元数据目录"
 rm -rf "$MAN"
 cp -a "$STAGE/__man" "$MAN"
+# 4c) 恢复我们自己的 .github/workflows（否则 CI 会被自己的 restack 删掉 ✗）
+if [ -d "$STAGE/__wf" ]; then mkdir -p .github/workflows; cp -a "$STAGE/__wf/." .github/workflows/ 2>/dev/null || true; info "已恢复 .github/workflows（保留自有 CI ✓）"; fi
 
 # 5) 重放定制：基线文件应用补丁，其余文件复制
 info "重放 woloong 定制"
