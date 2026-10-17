@@ -1,0 +1,19 @@
+--- a/src/components/mixins/theme.ts
++++ b/src/components/mixins/theme.ts
+@@ -71,12 +71,14 @@
+         // if no theme is set, return empty string to load the default logo
+         if (!(this.theme.logo?.show ?? false)) return ''
+ 
++        const logoExt = this.theme.logoExtension ?? 'svg'
++
+         // return light logo if theme is light and sidebarLogo is set to both
+         if (this.theme.logo?.light && this.themeMode === 'light')
+-            return `/img/themes/sidebarLogo-${this.themeName}-light.svg`
++            return `/img/themes/sidebarLogo-${this.themeName}-light.${logoExt}`
+ 
+         // return dark/generic theme logo
+-        return `/img/themes/sidebarLogo-${this.themeName}.svg`
++        return `/img/themes/sidebarLogo-${this.themeName}.${logoExt}`
+     }
+ 
+     get mainBgImage() {
