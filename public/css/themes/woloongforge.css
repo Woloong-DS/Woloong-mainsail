@@ -1,0 +1,245 @@
+/* Woloong Forge Theme - Custom Styles */
+
+/* ===== 1. 增大 Topbar Logo 并缩小到最小间距 ===== */
+.topbar .nav-logo {
+    height: 48px !important;
+    width: auto !important;
+    margin-right: 0px !important;
+    margin-left: 2px !important;
+}
+
+/* 缩小 Logo 和标题之间的间距到最小 */
+.topbar a[router-link] {
+    margin-right: 0px !important;
+    padding-right: 0px !important;
+}
+
+.topbar .v-toolbar__title {
+    margin-left: 2px !important;
+    padding-left: 0px !important;
+}
+
+/* 移除顶部栏可能存在的额外间距 */
+.topbar .v-toolbar__content {
+    padding-left: 4px !important;
+}
+
+/* ===== 2. 增大 Sidebar Logo ===== */
+.v-navigation-drawer .nav-logo {
+    height: 42px !important;
+    width: auto !important;
+}
+
+/* ===== 3. 增强 Sidebar 科技感 + 导航按钮悬浮感 ===== */
+.v-navigation-drawer {
+    border-right: 1px solid rgba(252, 0, 0, 0.15) !important;
+}
+
+/* 导航按钮默认状态：完全不透明实心背景 */
+.v-navigation-drawer .v-list-item {
+    margin: 4px 8px !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(252, 0, 0, 0.15) !important;
+    background: rgba(35, 35, 55, 0.98) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    transition: all 0.25s ease !important;
+}
+
+/* 导航按钮悬停状态：更强悬浮感 */
+.v-navigation-drawer .v-list-item:hover {
+    background: rgba(50, 35, 45, 0.98) !important;
+    border-color: rgba(252, 0, 0, 0.45) !important;
+    box-shadow: 0 6px 18px rgba(252, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    transform: translateX(4px) translateY(-1px) !important;
+}
+
+/* 导航按钮激活状态：高亮度科技感 */
+.v-navigation-drawer .v-list-item--active {
+    background: linear-gradient(90deg, rgba(252, 0, 0, 0.35) 0%, rgba(80, 35, 45, 0.98) 100%) !important;
+    border-left: 3px solid #fc0000 !important;
+    border-color: rgba(252, 0, 0, 0.5) !important;
+    box-shadow: 0 0 20px rgba(252, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* 激活状态悬停：更强亮度 */
+.v-navigation-drawer .v-list-item--active:hover {
+    background: linear-gradient(90deg, rgba(252, 0, 0, 0.45) 0%, rgba(90, 40, 50, 0.98) 100%) !important;
+    box-shadow: 0 0 24px rgba(252, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 导航按钮图标默认状态 */
+.v-navigation-drawer .v-list-item .v-icon {
+    color: rgba(255, 255, 255, 0.75) !important;
+    transition: all 0.25s ease !important;
+}
+
+/* 导航按钮图标悬停状态 */
+.v-navigation-drawer .v-list-item:hover .v-icon {
+    color: rgba(252, 0, 0, 0.95) !important;
+    text-shadow: 0 0 10px rgba(252, 0, 0, 0.6) !important;
+    transform: scale(1.15) !important;
+}
+
+/* 导航按钮文字默认状态 */
+.v-navigation-drawer .v-list-item__title {
+    color: rgba(255, 255, 255, 0.85) !important;
+    transition: all 0.25s ease !important;
+}
+
+/* 导航按钮文字悬停状态 */
+.v-navigation-drawer .v-list-item:hover .v-list-item__title {
+    color: #ffffff !important;
+}
+
+/* 激活状态图标：更亮 */
+.v-navigation-drawer .v-list-item--active .v-icon {
+    color: #ff3333 !important;
+    text-shadow: 0 0 10px rgba(252, 0, 0, 0.7) !important;
+}
+
+/* 激活状态文字：更亮更白 */
+.v-navigation-drawer .v-list-item--active .v-list-item__title {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* ===== 4. 增强按钮科技感 ===== */
+.v-btn.primary {
+    background: linear-gradient(135deg, #fc0000 0%, #cc0000 100%) !important;
+    box-shadow: 0 0 8px rgba(252, 0, 0, 0.3) !important;
+}
+
+.v-btn.primary:hover {
+    background: linear-gradient(135deg, #ff3333 0%, #ff0000 100%) !important;
+    box-shadow: 0 0 12px rgba(252, 0, 0, 0.5) !important;
+}
+
+/* ===== 5. 面板卡片科技感 ===== */
+.v-card {
+    border: 1px solid rgba(252, 0, 0, 0.12) !important;
+    box-shadow: 0 0 4px rgba(252, 0, 0, 0.05) !important;
+}
+
+.v-card__title {
+    border-bottom: 1px solid rgba(252, 0, 0, 0.15) !important;
+}
+
+.v-card:hover {
+    border-color: rgba(252, 0, 0, 0.2) !important;
+    box-shadow: 0 0 8px rgba(252, 0, 0, 0.1) !important;
+}
+
+/* 面板工具栏图标发光 */
+.panel-toolbar .v-btn--icon {
+    color: rgba(252, 0, 0, 0.85) !important;
+}
+
+.panel-toolbar .v-btn--icon:hover {
+    color: #fc0000 !important;
+    text-shadow: 0 0 8px rgba(252, 0, 0, 0.5) !important;
+}
+
+/* 温度图标发光 */
+.temperature-icon {
+    filter: drop-shadow(0 0 2px rgba(252, 0, 0, 0.3));
+}
+
+/* 侧边栏选中项图标发光 */
+.v-navigation-drawer .v-list-item--active .v-icon {
+    color: #fc0000 !important;
+    text-shadow: 0 0 6px rgba(252, 0, 0, 0.6) !important;
+}
+
+/* 输入框聚焦时红色边框 */
+.v-text-field--outlined fieldset {
+    border-color: rgba(252, 0, 0, 0.15) !important;
+}
+.v-text-field--outlined.v-input--is-focused fieldset {
+    border-color: rgba(252, 0, 0, 0.5) !important;
+    box-shadow: 0 0 4px rgba(252, 0, 0, 0.2) !important;
+}
+
+/* 表格悬停行红色 */
+.v-data-table tbody tr:hover {
+    background: rgba(252, 0, 0, 0.05) !important;
+}
+
+/* 芯片标签红色发光 */
+.v-chip.primary {
+    box-shadow: 0 0 6px rgba(252, 0, 0, 0.3) !important;
+}
+
+/* 开关激活红色 */
+.v-input--switch .v-input--switch__track.theme--dark {
+    color: rgba(252, 0, 0, 0.5) !important;
+}
+
+/* 滑块红色 */
+.v-slider__thumb {
+    border-color: #fc0000 !important;
+    box-shadow: 0 0 6px rgba(252, 0, 0, 0.5) !important;
+}
+.v-slider__track-fill {
+    background: #fc0000 !important;
+}
+
+/* 进度条红色发光 */
+.v-progress-linear {
+    box-shadow: 0 0 4px rgba(252, 0, 0, 0.2) !important;
+}
+.v-progress-linear__determinate {
+    filter: drop-shadow(0 0 2px rgba(252, 0, 0, 0.5)) !important;
+}
+
+/* 顶部栏红色边框线 */
+.topbar {
+    border-bottom: 1px solid rgba(252, 0, 0, 0.25) !important;
+    box-shadow: 0 0 8px rgba(252, 0, 0, 0.1) !important;
+}
+
+/* 通知图标红色 */
+.v-btn .v-icon.mdi-bell {
+    color: rgba(252, 0, 0, 0.8) !important;
+}
+
+/* 设置图标红色 */
+.v-btn .v-icon.mdi-cog {
+    color: rgba(252, 0, 0, 0.8) !important;
+}
+
+/* 面板图标红色 */
+.panel-icon {
+    color: rgba(252, 0, 0, 0.9) !important;
+}
+
+/* ===== 6. Sidebar 底部 Logo 匀速弹跳动画 ===== */
+.v-navigation-drawer::after {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 101px;
+    background-image: url('/img/themes/sidebarLogo-woloongforge.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+    /* 60秒完成一圈，linear匀速，全程速度一致 */
+    animation: logoBounce 60s linear infinite;
+}
+
+/* Logo 匀速反弹动画 — 按实际像素距离分配时间，确保横向/纵向速度一致 */
+@keyframes logoBounce {
+    /* 起点：左上 */
+    0%   { top: 45%; left: 0%; }
+    /* 向右匀速移动 (40px / 629px ≈ 6.4% 时间) */
+    6.4% { top: 45%; left: 18%; }
+    /* 碰到右边界，反弹向下 (275px / 629px ≈ 43.6% 时间) */
+    50%  { top: 80%; left: 18%; }
+    /* 碰到下边界，瞬间反弹向左 */
+    56.4%{ top: 80%; left: 0%; }
+    /* 碰到左边界，瞬间反弹向上，回到起点 */
+    100% { top: 45%; left: 0%; }
+}
