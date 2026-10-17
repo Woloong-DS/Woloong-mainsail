@@ -6,7 +6,7 @@
 #   · 重叠加（fork-sync：上游树替换 → 重放定制 → 应用 remove.list → 更新 upstream.json）
 #   · 门禁：定制资产完整性 + 构建产物含定制（不过则不发布）
 #   · 构建：npm ci + vite build；dist 作为 Release 资产（不进 git）
-#   · 发布：tag = woloong-<上游 tag>（与上游版本一一对应）；推送 main 与 tag
+#   · 发布：tag = 上游 tag 原文（与上游版本一一对应）；推送 main 与 tag
 #   · 通知下游：若有 WOLOONG_DISPATCH_TOKEN 则 repository_dispatch 通知 Woloong-OS 跟进
 #   · 漂移/失败：自动开 Issue（去重），绝不静默遗漏
 # ============================================================================
