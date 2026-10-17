@@ -1,13 +1,12 @@
 import { KlipperRepos, Theme } from '@/store/types'
 
 export const defaultMode = 'dark'
-export const defaultTheme = 'woloongforge'
-export const defaultLogoColor = '#fc0000'
-export const defaultPrimaryColor = '#fc0000'
+export const defaultTheme = 'mainsail'
+export const defaultLogoColor = '#D41216'
+export const defaultPrimaryColor = '#2196f3'
 export const defaultBigThumbnailBackground = '#1e1e1e'
 
 export const minKlipperVersion = 'v0.11.0-257'
-
 export const minMoonrakerVersion = 'v0.8.0-306'
 export const minBrowserVersions = [{ name: 'safari', version: '16.5.2' }]
 
@@ -186,7 +185,7 @@ export const excludeKeys = [
  * List of all Themes
  */
 export const themes: Theme[] = [
-    { name: 'mainsail', displayName: 'Mainsail', colorLogo: '#D41216' },
+    { name: 'mainsail', displayName: 'Mainsail', colorLogo: defaultLogoColor },
     {
         name: 'klipper',
         displayName: 'Klipper',
@@ -240,17 +239,6 @@ export const themes: Theme[] = [
         colorLogo: '#234D7A',
         colorPrimary: '#234D7A',
         logo: { show: true, light: false },
-    },
-    {
-        name: 'woloongforge',
-        displayName: 'Woloong Forge',
-        colorLogo: '#fc0000',
-        colorPrimary: '#fc0000',
-        logo: { show: true, light: false },
-        logoExtension: 'png',
-        sidebarBackground: { show: true, light: false },
-        mainBackground: { show: true, light: false },
-        css: true,
     },
 ]
 
