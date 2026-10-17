@@ -125,6 +125,12 @@ jobs:
           d = json.loads(p.read_text(encoding='utf-8')) if p.is_file() else {}
           d['version'] = tag
           d['asset_name'] = 'mainsail.zip'
+            # ★ 2026-10-17：Moonraker 判定 zip 归属读的是**包内 release_info.json 的 owner/repo** ✗
+            #   只写 asset_name 会导致它认成上游 mainsail-crew/mainsail → anomaly
+            #   'repo does not match detected repo' → **回退到上游** ✗ → 更新会覆盖 Woloong 定制 ✗
+            d['owner'] = 'Woloong-DS'
+            d['repo'] = 'Woloong-mainsail'
+            d['project_name'] = 'Woloong Mainsail'
           p.write_text(json.dumps(d, ensure_ascii=False) + '\n', encoding='utf-8')
           print('release_info.json ->', d)
           PY
