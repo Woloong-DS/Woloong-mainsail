@@ -32,6 +32,11 @@ on:
         required: false
         default: true
         type: boolean
+      force_rebuild:
+        description: '强制重建并重新发布（即使上游无新版本；用于修复打包/元数据）'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -80,7 +85,7 @@ jobs:
 
       - name: 重叠加（上游树替换 → 重放定制 → remove.list → 更新基线声明）
         id: restack
-        if: steps.audit.outputs.(behind != '0' || inputs.force_rebuild)
+        if: (steps.audit.outputs.behind != '0' || inputs.force_rebuild)
         run: |
           set -uo pipefail
           REF='${{ inputs.upstream_ref }}'; [ -n "$REF" ] || REF='${{ steps.audit.outputs.latest }}'
@@ -91,11 +96,11 @@ jobs:
           bash woloong-release/tools/fork-sync.sh . --upstream-ref "$REF" --tag "$TAG"
 
       - name: 门禁 —— 定制资产完整性
-        if: steps.audit.outputs.(behind != '0' || inputs.force_rebuild)
+        if: (steps.audit.outputs.behind != '0' || inputs.force_rebuild)
         run: bash woloong-release/tools/verify-assets.sh
 
       - name: 构建（npm ci + vite build）
-        if: steps.audit.outputs.(behind != '0' || inputs.force_rebuild)
+        if: (steps.audit.outputs.behind != '0' || inputs.force_rebuild)
         run: |
           set -euo pipefail
           npm ci --no-audit --no-fund
@@ -103,7 +108,7 @@ jobs:
           du -sh dist; ls dist | head
 
       - name: 门禁 —— 定制是否进入构建产物
-        if: steps.audit.outputs.(behind != '0' || inputs.force_rebuild)
+        if: (steps.audit.outputs.behind != '0' || inputs.force_rebuild)
         run: |
           set -euo pipefail
           N=$(grep -rl 'woloongforge' dist/assets 2>/dev/null | wc -l)
@@ -112,7 +117,7 @@ jobs:
 
       - name: 打包 Release 资产（dist 不进 git）
         id: pack
-        if: steps.audit.outputs.(behind != '0' || inputs.force_rebuild)
+        if: (steps.audit.outputs.behind != '0' || inputs.force_rebuild)
         run: |
           set -euo pipefail
           TAG='${{ steps.restack.outputs.tag }}'
@@ -143,7 +148,7 @@ jobs:
           echo "sha256=$(sha256sum "dist/mainsail.zip" | cut -c1-64)" >> "$GITHUB_OUTPUT"
 
       - name: 发布（推送 main + tag + Release 资产）
-        if: steps.audit.outputs.(behind != '0' || inputs.force_rebuild) && inputs.do_push
+        if: (steps.audit.outputs.behind != '0' || inputs.force_rebuild) && inputs.do_push
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -159,7 +164,7 @@ jobs:
           echo "已发布 Release $TAG（资产 mainsail-dist-$TAG.zip）"
 
       - name: 通知 Woloong-OS 跟进（把 sha/资产信息一并带过去，下游无需跨仓库权限）
-        if: steps.audit.outputs.(behind != '0' || inputs.force_rebuild) && inputs.do_push
+        if: (steps.audit.outputs.behind != '0' || inputs.force_rebuild) && inputs.do_push
         env:
           TOKEN: ${{ secrets.WOLOONG_DISPATCH_TOKEN }}
         run: |
@@ -179,7 +184,7 @@ jobs:
             https://api.github.com/repos/Woloong-DS/Woloong-OS/dispatches --data-binary @/tmp/dispatch.json
           echo '已通知 Woloong-OS（携带 sha/资产信息）'
       - name: 漂移或失败 → 开 Issue（不遗漏）
-        if: failure() && steps.audit.outputs.(behind != '0' || inputs.force_rebuild)
+        if: failure() && (steps.audit.outputs.behind != '0' || inputs.force_rebuild)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -189,9 +194,3 @@ jobs:
             '${{ steps.audit.outputs.latest }}' "$(tail -40 /tmp/audit.txt 2>/dev/null)")
           EXIST=$(gh issue list --state open --search "$TITLE" --json number -q '.[0].number' || true)
           if [ -n "$EXIST" ]; then gh issue comment "$EXIST" --body "$BODY"; else gh issue create --title "$TITLE" --body "$BODY"; fi
-      force_rebuild:
-        description: '强制重建并重新发布（即使上游无新版本；用于修复打包/元数据 ✓）'
-        required: false
-        default: false
-        type: boolean
-
