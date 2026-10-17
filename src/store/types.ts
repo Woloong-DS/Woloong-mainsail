@@ -48,7 +48,6 @@ export interface Theme {
         show: boolean
         light: boolean
     }
-    logoExtension?: string
     sidebarBackground?: {
         show: boolean
         light: boolean

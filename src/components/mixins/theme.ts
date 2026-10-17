@@ -71,14 +71,12 @@ export default class ThemeMixin extends Vue {
         // if no theme is set, return empty string to load the default logo
         if (!(this.theme.logo?.show ?? false)) return ''
 
-        const logoExt = this.theme.logoExtension ?? 'svg'
-
         // return light logo if theme is light and sidebarLogo is set to both
         if (this.theme.logo?.light && this.themeMode === 'light')
-            return `/img/themes/sidebarLogo-${this.themeName}-light.${logoExt}`
+            return `/img/themes/sidebarLogo-${this.themeName}-light.svg`
 
         // return dark/generic theme logo
-        return `/img/themes/sidebarLogo-${this.themeName}.${logoExt}`
+        return `/img/themes/sidebarLogo-${this.themeName}.svg`
     }
 
     get mainBgImage() {
