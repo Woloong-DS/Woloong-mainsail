@@ -124,17 +124,16 @@ jobs:
           # 固定资产名 mainsail.zip：Moonraker 的 zip 更新器按 release_info.json 的 asset_name 精确匹配；
           # 同时把 asset_name 写进包内 release_info.json（版本仍取自 release 的 tag_name）。
           python3 - "$TAG" <<'PY'
-            import json, pathlib, sys
-            tag = sys.argv[1]
-            p = pathlib.Path("dist/release_info.json")
-            d = json.loads(p.read_text(encoding='utf-8')) if p.is_file() else {}
-            d['version'] = tag
-            d['asset_name'] = 'mainsail.zip'
-            # Moonraker 判定 zip 归属读的是 project_owner/project_name（只写 asset_name 会认成上游 ✗）
-            d['project_owner'] = 'Woloong-DS'
-            d['project_name'] = 'Woloong-mainsail'
-            p.write_text(json.dumps(d, ensure_ascii=False) + '\n', encoding='utf-8')
-            print('release_info.json ->', d)
+          import json, pathlib, sys
+          tag = sys.argv[1]
+          p = pathlib.Path("dist/release_info.json")
+          d = json.loads(p.read_text(encoding='utf-8')) if p.is_file() else {}
+          d['version'] = tag
+          d['asset_name'] = 'mainsail.zip'
+          d['project_owner'] = 'Woloong-DS'
+          d['project_name'] = 'Woloong-mainsail'
+          p.write_text(json.dumps(d, ensure_ascii=False) + '\n', encoding='utf-8')
+          print('release_info.json ->', d)
           PY
           # 先打固定名（保证它是第一个资产），再打带版本名的副本便于人工/审计
           ( cd dist && zip -qr "mainsail.zip" . )
