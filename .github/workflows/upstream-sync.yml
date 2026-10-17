@@ -75,7 +75,7 @@ jobs:
           if [ "$rc" = "0" ]; then echo 'behind=0' >> "$GITHUB_OUTPUT"; else echo 'behind=1' >> "$GITHUB_OUTPUT"; fi
 
       - name: 无新版本 → 结束
-        if: steps.audit.outputs.behind == '0'
+        if: steps.audit.outputs.behind == '0' && !inputs.force_rebuild
         run: echo '发行树已对应上游最新发布，无需动作 ✓'
 
       - name: 重叠加（上游树替换 → 重放定制 → remove.list → 更新基线声明）
@@ -189,4 +189,9 @@ jobs:
             '${{ steps.audit.outputs.latest }}' "$(tail -40 /tmp/audit.txt 2>/dev/null)")
           EXIST=$(gh issue list --state open --search "$TITLE" --json number -q '.[0].number' || true)
           if [ -n "$EXIST" ]; then gh issue comment "$EXIST" --body "$BODY"; else gh issue create --title "$TITLE" --body "$BODY"; fi
+      force_rebuild:
+        description: '强制重建并重新发布（即使上游无新版本；用于修复打包/元数据 ✓）'
+        required: false
+        default: false
+        type: boolean
 
