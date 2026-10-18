@@ -160,6 +160,7 @@ jobs:
           echo "已发布 Release $TAG（资产 mainsail-dist-$TAG.zip）"
 
       - name: 通知 Woloong-OS 跟进（把 sha/资产信息一并带过去，下游无需跨仓库权限）
+        continue-on-error: true   # 通知是尽力而为 ✓ 失败不得掩盖同步成功 ✗
         if: (steps.audit.outputs.behind != '0' || inputs.force_rebuild) && inputs.do_push
         env:
           TOKEN: ${{ secrets.WOLOONG_DISPATCH_TOKEN }}
@@ -180,7 +181,9 @@ jobs:
             https://api.github.com/repos/Woloong-DS/Woloong-OS/dispatches --data-binary @/tmp/dispatch.json
           echo '已通知 Woloong-OS（携带 sha/资产信息）'
       - name: 漂移或失败 → 开 Issue（不遗漏）
-        if: failure() && (steps.audit.outputs.behind != '0' || inputs.force_rebuild)
+        # ★ 只在**核心链路**失败时报警 ✓（restack / 门禁 / 构建 / 发布）
+        #   不能因「通知」失败而误报「上游发布待吸收」✗（2026-10-18 实测 #14 失败 → #15 误报 ✗）
+        if: failure() && (steps.restack.outcome == 'failure' || steps.gate.outcome == 'failure' || steps.build.outcome == 'failure' || steps.pack.outcome == 'failure')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
