@@ -107,6 +107,12 @@
       "sha256": "19c25705750c81245d5556adb0a647dc27aa6610837dfd921c01f9b091f3b120",
       "bytes": 3240494,
       "kind": "asset"
+    },
+    {
+      "path": "README.md",
+      "sha256": "3197460c494c51b20f42d1072b4f51da81b17728acd1a938980c55f40d31be91",
+      "bytes": 7420,
+      "kind": "new-file"
     }
   ],
   "build_artifacts": {

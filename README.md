@@ -1,127 +1,184 @@
 <p align="center">
-  <a>
-    <img src="https://raw.githubusercontent.com/mainsail-crew/docs/master/assets/img/logo.png" alt='Mainsail logo' height="152">
-    <h1 align="center">Mainsail</h1>
-  </a>
+  <img src="public/img/themes/sidebarLogo-woloongforge.png" alt="Woloong" height="120">
 </p>
+
+<h1 align="center">Woloong-mainsail</h1>
+
 <p align="center">
-  Makes Klipper more accessible by adding a lightweight, responsive web user interface, centred around an intuitive and consistent design philosophy.
+  <b>官方 Mainsail + Woloong 定制</b><br>
+  面向 Klipper 的响应式 Web 前端 · 内置 Woloong Forge 主题 · 随上游版本滚动更新
 </p>
+
 <p align="center">
-  <a aria-label="Downloads" href="https://github.com/mainsail-crew/mainsail/releases">
-    <img src="https://img.shields.io/github/downloads/mainsail-crew/mainsail/total?style=flat-square">
-  </a>
-  <a aria-label="Stars" href="https://github.com/mainsail-crew/mainsail/stargazers">
-    <img src="https://img.shields.io/github/stars/mainsail-crew/mainsail?style=flat-square">
-  </a>
-  <a aria-label="Forks" href="https://github.com/mainsail-crew/mainsail/network/members">
-    <img src="https://img.shields.io/github/forks/mainsail-crew/mainsail?style=flat-square">
-  </a>
-  <a href="https://hosted.weblate.org/engage/mainsail/">
-    <img src="https://hosted.weblate.org/widget/mainsail/mainsail/svg-badge.svg" alt="Übersetzungsstatus" />
-  </a>
-  <a aria-label="License" href="https://github.com/mainsail-crew/mainsail/blob/develop/LICENSE">
-    <img src="https://img.shields.io/github/license/mainsail-crew/mainsail?style=flat-square">
-  </a>
-  <a aria-label="Last commit" href="https://github.com/mainsail-crew/mainsail/commits/">
-    <img src="https://img.shields.io/github/last-commit/meteyou/mainsail?style=flat-square">
-  </a>
-  <br />
-  <a aria-label="Size" href="https://github.com/mainsail-crew/mainsail/">
-    <img src="https://img.shields.io/github/repo-size/meteyou/mainsail?style=flat-square">
-  </a>
-  <a aria-label="Discord" href="https://discord.gg/skWTwTD">
-    <img src="https://img.shields.io/discord/758059413700345988?color=%235865F2&label=discord&logo=discord&logoColor=white&style=flat-square">
-  </a>
-  <a aria-label="Patreon" href="https://www.patreon.com/meteyou">
-    <img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dmeteyou%26type%3Dpatrons&style=flat-square">
-  </a>
+  <a href="https://github.com/Woloong-DS/Woloong-mainsail/releases">Releases</a> ·
+  <a href="woloong-release/README.md">定制说明</a> ·
+  <a href="https://github.com/mainsail-crew/mainsail">上游仓库</a> ·
+  <a href="https://docs.mainsail.xyz">上游文档</a>
 </p>
 
-## Getting Started
+---
 
-Visit [docs.mainsail.xyz/setup](https://docs.mainsail.xyz/setup) to get started with Mainsail.
+## 这是什么
 
-Mainsail is also available in remote mode on [http://my.mainsail.xyz](http://my.mainsail.xyz). Find
-out [more](https://docs.mainsail.xyz/setup#mymainsailxyz).
+本仓库是 [mainsail-crew/mainsail](https://github.com/mainsail-crew/mainsail) 的**自有发行树**：
 
-## Documentation
+> `main` = 官方 Mainsail（当前基线 v2.19.0） + Woloong 定制
 
-Visit [docs.mainsail.xyz](https://docs.mainsail.xyz) to view the full documentation.  
-You can find the latest release notes [here](https://github.com/mainsail-crew/mainsail/releases).
+构建产物**不进 git**，以 **Release 资产** 的形式发布，供 Woloong-OS 镜像与 Moonraker 的
+zip 更新器直接取用。本仓库只做「吸收上游 → 重放定制 → 门禁 → 构建 → 发布」，不向上游提交 PR。
 
-## Screenshots
+| 项目 | 说明 |
+| --- | --- |
+| 上游 | `mainsail-crew/mainsail`（GPL-3.0，版权归上游作者） |
+| 定制清单 | [`woloong-release/assets.manifest.tsv`](woloong-release/assets.manifest.tsv)（逐文件 SHA256） |
+| 当前基线 | [`woloong-release/upstream.json`](woloong-release/upstream.json) 的 `base_ref` |
+| 构建产物 | `dist/`（不进 git，发布为 Release 资产） |
 
-![screenshot-dashboard](https://raw.githubusercontent.com/mainsail-crew/docs/master/assets/img/screenshot.png)
-![Features](https://raw.githubusercontent.com/mainsail-crew/docs/master/assets/img/features.png)
+---
 
-## Features
+## 版本与发布规则
 
-- **Responsive Web Interface:** _Optimized for desktops, tablets and mobile devices_
-- **Printer Farm:** _Supports multiple 3D printers_
-- **[Localization](https://docs.mainsail.xyz/features/localization):** _Choose between 12 different languages_
-- **File Manager:** _Delete, rename and upload your G-Code and config files_
-- **File Editor:** _Edit G-Code and config files with syntax highlighting in your browser_
-- **[Print History](https://docs.mainsail.xyz/features/history):** _See your previous prints and their status_
-- **[Statistics](https://docs.mainsail.xyz/features/history):** _View how much time your printer has been in use and the number of jobs that have succeeded or failed_
-- **Job Queue:** _Queue multiple jobs and add them directly from your slicer_
-- **[Temperature Presets](https://docs.mainsail.xyz/features/presets):** _Manage different temperature presets for easy preheating_
-- **[Bed Mesh Visualisation](https://docs.mainsail.xyz/features/bedmesh):** _View your bed using a 3D mesh graph_
-- **G-Code Viewer:** _View a 3D render of your print and follow the progress_
-- **Multi-Webcam Support:** _View your print from different angles with multiple webcams_
-- **Timelapse Integration:** _Automatically record a timelapse of your print using [moonraker-timelapse](https://github.com/mainsail-crew/moonraker-timelapse)_
-- **Power Control:** _Control power devices such as relays, TP-Link and Tasmota devices, and more_
-- **Powerful Macro-Management:** _Manage your macros on a micro level_
-- **[Configurable Dashboard](https://docs.mainsail.xyz/features/dashboard-organisation):** _Create your own personal dashboard_
-- **[Theming Support](https://docs.mainsail.xyz/features/theming):** _Customizable user interface including logos, backgrounds, and custom CSS_
-- **[Additional Sensors](https://docs.mainsail.xyz/quicktips/additional-sensors):** _Add extra sensors to the temperature graph_
-- **Exclude Objects:** _Exclude parts of your print <sup>(not officially supported by Klipper yet)</sup>_
+版本号**直接采用上游发布版本**，加 `woloong-` 前缀，便于一一对照；不再与上游 tag 同名，避免同名 tag 指向不同提交而互相覆盖。
 
-## Help and Support
+| 对象 | 规则 | 示例 |
+| --- | --- | --- |
+| git tag | `woloong-<上游 tag>` | `woloong-v2.19.0` |
+| Release 标题 | 与 tag 完全一致 | `woloong-v2.19.0` |
+| Release 资产 | `<tag>.zip`（唯一资产） | `woloong-v2.19.0.zip` |
+| 包内 `release_info.json` | `version` 与 `asset_name` 均与上述一致 | — |
 
-Do you need help or just want to talk? Join our active community on [Discord](https://discord.gg/skWTwTD)!
+> Moonraker 判定「是否最新」用的是**字符串相等**（`release_info.json.version` vs Release `tag_name`），
+> 所以这四个地方的版本串必须逐字一致。上游发布 v2.20.0 时，本仓库自动产出
+> `woloong-v2.20.0` 与 `woloong-v2.20.0.zip`。
 
-Did you find a bug or did you thought of a feature?
-Please create an [Issue](https://github.com/mainsail-crew/mainsail/issues) in GitHub and let us know.
+**当前发行：见 [Releases](https://github.com/Woloong-DS/Woloong-mainsail/releases)。**
 
-## Official Sponsors
+---
 
-<p align='center'>
-    <img src="https://raw.githubusercontent.com/mainsail-crew/docs/master/assets/img/logo-bigtreetech.png" alt='Mainsail logo' width="150">
-</p>
+## 安装 / 更新
 
-**BIGTREETECH** is the official mainboard partner of Mainsail. BIGTREETECH is committed to developing innovative and competitive products to better serve the 3D printing community.
+### A. 交给 Moonraker 自动更新（推荐）
 
-## Support Mainsail
+在 `moonraker.conf` 中：
 
-Mainsail is primarily developed and maintained by meteyou. To keep the project going he invests his free time, almost
-every day. To motivate him (☕🍺😜) there are several ways to support him:
+```ini
+[update_manager mainsail]
+type: web
+repo: Woloong-DS/Woloong-mainsail
+path: ~/mainsail
+```
 
-[![patreon](https://img.shields.io/badge/patreon-participate-yellow.svg?style=flat-square)](https://www.patreon.com/meteyou)
-[![kofi](https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg?style=flat-square)](https://ko-fi.com/mainsail)
+保存后重启 Moonraker，之后在网页端的「机器 → 更新」里即可看到版本并一键更新。
 
-## Contributing
+### B. 手动更新（脚本）
 
-Contributions to Mainsail are always welcome!
+```bash
+tag=$(curl -fsSL https://api.github.com/repos/Woloong-DS/Woloong-mainsail/releases/latest | jq -r .tag_name)
+tmp=$(mktemp -d)
+curl -fsSL -o "$tmp/$tag.zip" \
+  "https://github.com/Woloong-DS/Woloong-mainsail/releases/download/$tag/$tag.zip"
+unzip -oq "$tmp/$tag.zip" -d ~/mainsail
+rm -rf "$tmp"
+echo "已更新到 $tag"
+```
 
-- 📥 Pull requests and 🌟 Stars are always welcome.
-- Read our [contributing guidelines](CONTRIBUTING.md) to get started,
-  or find us on [Discord](https://discord.gg/mainsail), we will take the time to guide you.
+### C. 随镜像预装
 
-Looking for a first issue to tackle?
+Woloong-OS 镜像已内置本前端（`~/mainsail`），镜像烧录后无需手动安装，
+后续更新走 A 或 B。
 
-- We tag issues with [![Good First Issue](https://img.shields.io/github/issues/mainsail-crew/mainsail/good%20first%20issue.svg)](https://github.com/mainsail-crew/mainsail/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) when we think they are well suited for people who are new to the codebase or OSS in general.
-- [Talk to us](https://discord.gg/mainsail), we'll find something that suits your skills and learning interest.
+---
 
-## Credit, sources and inspiration
+## 上游同步与发布（自动化）
 
-- [Kevin O'Connor](https://github.com/KevinOConnor) for the awesome 3D printer firmware [Klipper](https://github.com/KevinOConnor/klipper)
-- [Eric Callahan (arksine)](https://github.com/Arksine) for [Moonraker (Klipper API)](https://github.com/Arksine/moonraker). Without Moonraker, Mainsail would not be possible.
-- [lixxbox](https://github.com/lixxbox) for the Mainsail logo & Docs
-- [Vue.js](https://vuejs.org/): The Progressive JavaScript Framework
-- [Vuetify](https://vuetifyjs.com/): Material Design Component Framework for Vue.js
+由 [`.github/workflows/upstream-sync.yml`](.github/workflows/upstream-sync.yml) 承担，每周一 03:23 UTC 定时审计，也可手动触发。
 
-Massive thanks to the whole [Voron Design](http://vorondesign.com/) community. Without them such a project would not be
-possible.
+```
+上游版本审计 ──┬─ 无新版且已发布 ──────────────→ 结束（约 15 秒，零产出）
+               ├─ 无新版但本版本尚无 Release ──→ 仅构建 + 补发布资产（不动 tag）
+               └─ 有新版 ───────────────────→ 重叠加 → 门禁 → 构建 → 打包 → 发布 → 通知下游
+```
 
-[Full Credits & License information](https://docs.mainsail.xyz/credits)
+- **重叠加**：上游整树替换 → 重放定制补丁 → 应用 `remove.list` → 更新基线声明；
+  结果与当前树完全一致时**不产生任何提交、不移动 tag**（幂等）。
+- **门禁**：定制文件 SHA256 全量校验 + 构建产物中必须含 `woloongforge` 标记，任一不过即拒绝发布。
+- **漂移保护**：上游若改动了被打补丁的受控文件，流程会**停下来**并要求人工重锚定
+  （更新 `woloong-release/baseline/` → 重新生成补丁 → 更新清单哈希），不会带着错补丁发布。
+- **通知下游**：发布成功后以 `repository_dispatch`（事件 `component-released`）通知
+  Woloong-OS 更新适配层（`pin` / `pin_ref` / 资产名）。
+
+---
+
+## 定制内容
+
+受控文件（打补丁）与新增文件（直接复制）共 17 项，逐项记录在
+[`woloong-release/assets.manifest.tsv`](woloong-release/assets.manifest.tsv)：
+
+| 类别 | 路径 |
+| --- | --- |
+| 受控文件（打补丁） | `index.html`、`src/components/mixins/theme.ts`、`src/store/types.ts`、`src/store/variables.ts` |
+| 新增主题 | `public/css/themes/woloongforge.css`、`public/img/themes/*-woloongforge.png` |
+| 资产容器 | `Mainsail_Theme_Woloong/`（主题源文件、部署脚本、历史补丁） |
+| 发行元数据 | `woloong-release/`（基线、补丁、清单、工具） |
+
+定制细节与风险说明见 [`woloong-release/README.md`](woloong-release/README.md)。
+
+---
+
+## 仓库结构
+
+| 路径 | 作用 |
+| --- | --- |
+| `src/`、`public/` | Mainsail 源码与静态资源（含 Woloong 定制） |
+| `woloong-release/` | 发行元数据：基线、补丁、清单、`upstream.json`、工具脚本 |
+| `Mainsail_Theme_Woloong/` | 主题资产容器（源文件 + 已构建 `dist`） |
+| `.github/workflows/` | `upstream-sync`：审计 / 重叠加 / 门禁 / 构建 / 发布 / 通知 |
+| `cypress/`、`tests/` | 上游的端到端与单元测试 |
+
+---
+
+## 本地开发
+
+```bash
+npm ci                 # 安装依赖
+npm run serve          # 开发服务器 http://localhost:8080
+npm run build          # 生产构建（产物在 dist/）
+npm run lint           # ESLint
+npm run test:unit      # Vitest
+```
+
+> 本仓库要求 **LF** 换行与 Vue Class Component 写法，提交前请跑 `npm run format`。
+> 详见 [`AGENTS.md`](AGENTS.md) 与 [`agent_docs/`](agent_docs/)。
+
+---
+
+## 发布产物形态
+
+`woloong-v2.19.0.zip` 解压后即为可直接托管的静态站点：
+
+```
+index.html  assets/  css/  img/  fonts/  config.json
+manifest.webmanifest  sw.js  workbox-*.js  .version
+release_info.json   # {"project_owner":"Woloong-DS","project_name":"Woloong-mainsail",
+                    #  "version":"woloong-v2.19.0","asset_name":"woloong-v2.19.0.zip"}
+```
+
+---
+
+## 维护者须知
+
+- **改动任何定制文件后**，必须同步更新 `woloong-release/assets.manifest.tsv`（与 `.json`）中的
+  `sha256` / `bytes`，否则 CI 的「定制资产完整性」门禁会失败：
+  ```bash
+  bash woloong-release/tools/verify-assets.sh    # 本地自检
+  ```
+- **修改本 README 也一样**（它本身是受清单保护的定制文件）。
+- 手动重叠加：`bash woloong-release/tools/fork-sync.sh . --upstream-ref <上游 tag> --tag woloong-<上游 tag>`。
+- 审计上游是否落后：`bash woloong-release/tools/check-upstream.sh`。
+
+---
+
+## 许可与致谢
+
+本项目遵循上游 **GPL-3.0** 许可，Mainsail 的版权归 [mainsail-crew](https://github.com/mainsail-crew) 及其贡献者所有。
+Woloong 定制部分由 [Woloong-DS](https://github.com/Woloong-DS) 维护。
