@@ -190,6 +190,9 @@ jobs:
           p.write_text(json.dumps(d, ensure_ascii=False) + '\n', encoding='utf-8')
           print('release_info.json ->', d)
           PY
+          # ★ npm run build 里的 build.zip 会生成 dist/mainsail.zip；
+          #   若不清掉，它会被打进本次资产（实测体积翻倍：3.18MB → 6.37MB）✗
+          rm -f dist/*.zip
           ( cd dist && zip -qr "$ASSET" . )
           ls -lh "dist/$ASSET"
           echo "asset=dist/$ASSET" >> "$GITHUB_OUTPUT"
