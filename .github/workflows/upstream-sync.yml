@@ -9,7 +9,8 @@
 #   · 已发布性审计：本仓库是否真的为 base_ref 建过 Release 且含 mainsail.zip
 #     —— 否则"上游没有新版"≠"我们没东西可做"，需要走「仅补发布」路径
 #   · 三种结局：落后→重叠加+构建+发布 / 未落后但未发布→仅构建+补发布 / 已发布→结束
-#   · 发布：tag = 上游 tag 原文（与上游版本一一对应）；推送 main 与 tag
+#   · 发布：tag = woloong-<上游 tag>（独立命名空间，避免与上游同名 tag 指向不同提交而互相覆盖）
+#     包内 release_info.json.version 与 Release tag_name 完全一致（Moonraker 按字符串相等判定"已是最新"）
 #   · 通知下游：若有 WOLOONG_DISPATCH_TOKEN 则 repository_dispatch 通知 Woloong-OS 跟进
 #   · 漂移/失败：自动开 Issue（去重），绝不静默遗漏
 # ============================================================================
@@ -89,8 +90,11 @@ jobs:
         run: |
           set -uo pipefail
           BASE=$(python3 -c "import json;print(json.load(open('woloong-release/upstream.json',encoding='utf-8'))['base_ref'])")
+          # ★ 我们的发行 tag 用独立命名空间 woloong-<上游 tag>，不与上游同名
+          TAG="woloong-$BASE"
           echo "base=$BASE" >> "$GITHUB_OUTPUT"
-          NAMES=$(gh release view "$BASE" --repo "$GITHUB_REPOSITORY" --json assets -q '.assets[].name' 2>/dev/null || true)
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          NAMES=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets -q '.assets[].name' 2>/dev/null || true)
           if printf '%s\n' "$NAMES" | grep -qx 'mainsail.zip'; then
             echo 'published=1' >> "$GITHUB_OUTPUT"
             echo "发布状态: $BASE 已有 Release 且含 mainsail.zip ✓"
@@ -123,7 +127,9 @@ jobs:
         run: |
           set -uo pipefail
           REF='${{ inputs.upstream_ref }}'; [ -n "$REF" ] || REF='${{ steps.audit.outputs.latest }}'
-          TAG='${{ inputs.next_tag }}';  [ -n "$TAG" ] || TAG="$REF"
+          # ★ 独立 tag 命名空间：woloong-<上游 tag>（如 woloong-v2.19.0）
+          #   避免与上游同名 tag 指向不同提交 → fetch --tags 冲突 / --force 互相覆盖
+          TAG='${{ inputs.next_tag }}';  [ -n "$TAG" ] || TAG="woloong-$REF"
           echo "ref=$REF" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "重叠加目标：上游 $REF → 我们的 tag $TAG"
@@ -156,7 +162,7 @@ jobs:
           set -uo pipefail
           TAG='${{ inputs.next_tag }}'
           [ -n "$TAG" ] || TAG='${{ steps.restack.outputs.tag }}'
-          [ -n "$TAG" ] || TAG='${{ steps.published.outputs.base }}'
+          [ -n "$TAG" ] || TAG='${{ steps.published.outputs.tag }}'
           [ -n "$TAG" ] || { echo '::error::无法确定发布 tag（缺 next_tag / restack / base_ref）'; exit 1; }
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "发布 tag = $TAG"
@@ -205,7 +211,13 @@ jobs:
             git push -f origin "$TAG"
             echo "已推送 main 与 tag $TAG"
           else
-            echo "本次未产生新提交（重叠加幂等 / 仅补发布）→ 不推送 main、不移动 tag $TAG，只更新 Release 资产"
+            if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null 2>&1; then
+              echo "本次未产生新提交（重叠加幂等 / 仅补发布）→ 不推送 main、不移动 tag $TAG，只更新 Release 资产"
+            else
+              echo "本次未产生新提交，但 tag $TAG 尚不存在 → 在 HEAD 上补建并推送（不移动任何已有 tag）"
+              git tag -a "$TAG" -m "发行树：上游基线 ${{ steps.published.outputs.base }} + woloong 定制（补建）"
+              git push origin "$TAG"
+            fi
           fi
           gh release view "$TAG" --repo Woloong-DS/Woloong-mainsail >/dev/null 2>&1 || gh release create "$TAG" --repo Woloong-DS/Woloong-mainsail --title "mainsail $TAG" --notes "上游基线 ${{ steps.published.outputs.base }} + woloong 定制"
           gh release upload "$TAG" --repo Woloong-DS/Woloong-mainsail '${{ steps.pack.outputs.asset }}' --clobber
