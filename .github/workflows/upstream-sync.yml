@@ -221,7 +221,9 @@ jobs:
         run: |
           set -uo pipefail
           TAG='${{ steps.tag.outputs.tag }}'
-          SHA=$(git rev-parse HEAD)
+          # ★ 以 tag 指向的提交为准，而不是 HEAD：
+          #   补发布/幂等重跑时 tag 不会前移，用 HEAD 会让下游 pin 到一个"未发布"的提交
+          SHA=$(git rev-list -n1 "$TAG" 2>/dev/null || git rev-parse HEAD)
           ASSET_PATH='${{ steps.pack.outputs.asset }}'
           ASSET="$(basename "$ASSET_PATH")"   # ★ 下游按资产名精确匹配：必须是 mainsail.zip，不能是 dist/mainsail.zip
           ASHA='${{ steps.pack.outputs.sha256 }}'
