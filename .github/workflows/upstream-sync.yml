@@ -196,13 +196,16 @@ jobs:
         run: |
           set -euo pipefail
           TAG='${{ steps.tag.outputs.tag }}'
-          if [ "${{ steps.gate.outputs.restack }}" = "1" ]; then
+          # ★ 以"本次是否真的产生了新提交"为准，而不是"是否跑了重叠加"：
+          #   force_rebuild 触发时重叠加会跑，但幂等检查可能判定无变化（HEAD 未动）——
+          #   这时不应推送 main，更不应 git tag -f 移动已有 tag ✗
+          if [ "$(git rev-parse HEAD)" != "${{ github.sha }}" ]; then
             git push origin HEAD:main
             git tag -f "$TAG" >/dev/null 2>&1 || true
             git push -f origin "$TAG"
             echo "已推送 main 与 tag $TAG"
           else
-            echo "补发布模式：main 与 tag $TAG 均已存在，不推送（只补 Release 资产）"
+            echo "本次未产生新提交（重叠加幂等 / 仅补发布）→ 不推送 main、不移动 tag $TAG，只更新 Release 资产"
           fi
           gh release view "$TAG" --repo Woloong-DS/Woloong-mainsail >/dev/null 2>&1 || gh release create "$TAG" --repo Woloong-DS/Woloong-mainsail --title "mainsail $TAG" --notes "上游基线 ${{ steps.published.outputs.base }} + woloong 定制"
           gh release upload "$TAG" --repo Woloong-DS/Woloong-mainsail '${{ steps.pack.outputs.asset }}' --clobber
