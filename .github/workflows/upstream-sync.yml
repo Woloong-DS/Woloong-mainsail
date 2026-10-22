@@ -218,12 +218,23 @@ jobs:
         if: steps.gate.outputs.publish == '1' && inputs.do_push
         env:
           TOKEN: ${{ secrets.WOLOONG_DISPATCH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -uo pipefail
           TAG='${{ steps.tag.outputs.tag }}'
-          # ★ 以 tag 指向的提交为准，而不是 HEAD：
-          #   补发布/幂等重跑时 tag 不会前移，用 HEAD 会让下游 pin 到一个"未发布"的提交
-          SHA=$(git rev-list -n1 "$TAG" 2>/dev/null || git rev-parse HEAD)
+          # ★ 以"远端 tag 指向的提交"为准，不能用本地 tag、更不能用 HEAD：
+          #   · 本地 tag 会被检出阶段的 `git fetch upstream --tags --force` 覆盖成上游同名 tag（实测指向 5fb9e77f）✗
+          #   · 补发布/幂等重跑时 tag 不会前移，用 HEAD 会让下游 pin 到一个"未发布"的提交 ✗
+          SHA=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" --jq '.object.sha' 2>/dev/null || true)
+          if [ -n "$SHA" ]; then
+            # annotated tag 需要再解一层到 commit
+            DEREF=$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$SHA" --jq '.object.sha' 2>/dev/null || true)
+            [ -n "$DEREF" ] && SHA="$DEREF"
+            echo "远端 tag $TAG → $SHA"
+          else
+            SHA=$(git rev-parse HEAD)
+            echo "::warning::无法从远端解析 tag $TAG，回退到 HEAD $SHA"
+          fi
           ASSET_PATH='${{ steps.pack.outputs.asset }}'
           ASSET="$(basename "$ASSET_PATH")"   # ★ 下游按资产名精确匹配：必须是 mainsail.zip，不能是 dist/mainsail.zip
           ASHA='${{ steps.pack.outputs.sha256 }}'
