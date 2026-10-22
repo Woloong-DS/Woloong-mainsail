@@ -6,10 +6,11 @@
 #   · 重叠加（fork-sync：上游树替换 → 重放定制 → 应用 remove.list → 更新 upstream.json）
 #   · 门禁：定制资产完整性 + 构建产物含定制（不过则不发布）
 #   · 构建：npm ci + vite build；dist 作为 Release 资产（不进 git）
-#   · 已发布性审计：本仓库是否真的为 base_ref 建过 Release 且含 mainsail.zip
+#   · 已发布性审计：本仓库是否真的为 base_ref 建过 Release，且含 <tag>.zip 资产
 #     —— 否则"上游没有新版"≠"我们没东西可做"，需要走「仅补发布」路径
 #   · 三种结局：落后→重叠加+构建+发布 / 未落后但未发布→仅构建+补发布 / 已发布→结束
 #   · 发布：tag = woloong-<上游 tag>（独立命名空间，避免与上游同名 tag 指向不同提交而互相覆盖）
+#     标题 = tag 名，资产 = tag 名 + .zip（如 woloong-v2.19.0 / woloong-v2.19.0.zip）
 #     包内 release_info.json.version 与 Release tag_name 完全一致（Moonraker 按字符串相等判定"已是最新"）
 #   · 通知下游：若有 WOLOONG_DISPATCH_TOKEN 则 repository_dispatch 通知 Woloong-OS 跟进
 #   · 漂移/失败：自动开 Issue（去重），绝不静默遗漏
@@ -95,13 +96,13 @@ jobs:
           echo "base=$BASE" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           NAMES=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets -q '.assets[].name' 2>/dev/null || true)
-          if printf '%s\n' "$NAMES" | grep -qx 'mainsail.zip'; then
+          if printf '%s\n' "$NAMES" | grep -qx "${TAG}.zip"; then
             echo 'published=1' >> "$GITHUB_OUTPUT"
-            echo "发布状态: $BASE 已有 Release 且含 mainsail.zip ✓"
+            echo "发布状态: $TAG 已有 Release 且含 ${TAG}.zip ✓"
           else
             echo 'published=0' >> "$GITHUB_OUTPUT"
             ASSETS=$(printf '%s' "${NAMES:-无}" | tr '\n' ',' | sed 's/,$//')
-            echo "::warning::$BASE 尚无 Release 资产 mainsail.zip（现有资产: $ASSETS）→ 本次需要补发布"
+            echo "::warning::$TAG 尚无 Release 资产 ${TAG}.zip（现有资产: $ASSETS）→ 本次需要补发布"
           fi
 
       - name: 决策（重叠加 / 仅补发布 / 结束）
@@ -173,27 +174,27 @@ jobs:
         run: |
           set -euo pipefail
           TAG='${{ steps.tag.outputs.tag }}'
-          # 固定资产名 mainsail.zip：Moonraker 的 zip 更新器按 release_info.json 的 asset_name 精确匹配；
-          # 同时把 asset_name 写进包内 release_info.json（版本仍取自 release 的 tag_name）。
-          python3 - "$TAG" <<'PY'
+          # ★ 统一命名：**资产名 = tag 名 + .zip**（如 woloong-v2.19.0.zip）
+          #   Moonraker 按 release_info.json 的 asset_name 精确匹配资产，
+          #   所以二者必须逐字一致；Release 标题同样直接用 tag 名。
+          ASSET="${TAG}.zip"
+          python3 - "$TAG" "$ASSET" <<'PY'
           import json, pathlib, sys
-          tag = sys.argv[1]
+          tag, asset = sys.argv[1], sys.argv[2]
           p = pathlib.Path("dist/release_info.json")
           d = json.loads(p.read_text(encoding='utf-8')) if p.is_file() else {}
           d['version'] = tag
-          d['asset_name'] = 'mainsail.zip'
+          d['asset_name'] = asset
           d['project_owner'] = 'Woloong-DS'
           d['project_name'] = 'Woloong-mainsail'
           p.write_text(json.dumps(d, ensure_ascii=False) + '\n', encoding='utf-8')
           print('release_info.json ->', d)
           PY
-          # 先打固定名（保证它是第一个资产），再打带版本名的副本便于人工/审计
-          ( cd dist && zip -qr "mainsail.zip" . )
-          cp "dist/mainsail.zip" "dist/mainsail-dist-$TAG.zip"
-          ls -lh "dist/mainsail.zip" "dist/mainsail-dist-$TAG.zip"
-          echo "asset=dist/mainsail.zip" >> "$GITHUB_OUTPUT"
-          echo "asset_versioned=dist/mainsail-dist-$TAG.zip" >> "$GITHUB_OUTPUT"
-          echo "sha256=$(sha256sum "dist/mainsail.zip" | cut -c1-64)" >> "$GITHUB_OUTPUT"
+          ( cd dist && zip -qr "$ASSET" . )
+          ls -lh "dist/$ASSET"
+          echo "asset=dist/$ASSET" >> "$GITHUB_OUTPUT"
+          echo "asset_name=$ASSET" >> "$GITHUB_OUTPUT"
+          echo "sha256=$(sha256sum "dist/$ASSET" | cut -c1-64)" >> "$GITHUB_OUTPUT"
 
       - name: 发布（推送 main + tag + Release 资产）
         if: steps.gate.outputs.publish == '1' && inputs.do_push
@@ -219,10 +220,14 @@ jobs:
               git push origin "$TAG"
             fi
           fi
-          gh release view "$TAG" --repo Woloong-DS/Woloong-mainsail >/dev/null 2>&1 || gh release create "$TAG" --repo Woloong-DS/Woloong-mainsail --title "mainsail $TAG" --notes "上游基线 ${{ steps.published.outputs.base }} + woloong 定制"
+          # 标题与资产名统一为 tag：woloong-v2.19.0 / woloong-v2.19.0.zip
+          if gh release view "$TAG" --repo Woloong-DS/Woloong-mainsail >/dev/null 2>&1; then
+            gh release edit "$TAG" --repo Woloong-DS/Woloong-mainsail --title "$TAG"
+          else
+            gh release create "$TAG" --repo Woloong-DS/Woloong-mainsail --title "$TAG" --notes "上游基线 ${{ steps.published.outputs.base }} + Woloong 定制"
+          fi
           gh release upload "$TAG" --repo Woloong-DS/Woloong-mainsail '${{ steps.pack.outputs.asset }}' --clobber
-          gh release upload "$TAG" --repo Woloong-DS/Woloong-mainsail '${{ steps.pack.outputs.asset_versioned }}' --clobber 2>/dev/null || true
-          echo "已发布 Release $TAG（资产 mainsail-dist-$TAG.zip）"
+          echo "已发布 Release $TAG（资产 ${{ steps.pack.outputs.asset_name }}）"
 
       - name: 通知 Woloong-OS 跟进（把 sha/资产信息一并带过去，下游无需跨仓库权限）
         id: notify
@@ -250,7 +255,7 @@ jobs:
           fi
           is_sha "$SHA" || { echo "::error::解析出的 sha 非法：$SHA"; exit 1; }
           ASSET_PATH='${{ steps.pack.outputs.asset }}'
-          ASSET="$(basename "$ASSET_PATH")"   # ★ 下游按资产名精确匹配：必须是 mainsail.zip，不能是 dist/mainsail.zip
+          ASSET="$(basename "$ASSET_PATH")"   # ★ 下游按资产名精确匹配：要 woloong-v2.19.0.zip，不能是 dist/woloong-v2.19.0.zip
           ASHA='${{ steps.pack.outputs.sha256 }}'
           if [ -z "$TOKEN" ]; then
             echo "::notice::未配置 WOLOONG_DISPATCH_TOKEN —— 请手动在 Woloong-OS 执行：bash tools/sync-component-release.sh mainsail $TAG"
