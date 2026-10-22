@@ -1,0 +1,6 @@
+{
+  "repo": "mainsail-crew/mainsail",
+  "base_ref": "v2.19.0",
+  "base_sha": "5fb9e77fb9f4e60cf0725d9dc7f57cf7b84bbd70",
+  "note": "由 tools/fork-sync.sh 在重叠加成功后自动更新；tools/check-upstream.sh 据此审计是否遗漏上游发布。"
+}
