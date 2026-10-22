@@ -38,6 +38,11 @@ info "仓库      : $(pwd)"
 info "工作区脏数: $(git status --porcelain | wc -l)"
 [ "$(git status --porcelain | wc -l)" -eq 0 ] || die "工作区不干净，请先提交或还原"
 
+# 记下起点，供最后的「幂等检查」使用（上游内容没变时不该产生空提交 / 移动 tag）
+ORIG="$(git rev-parse HEAD)"
+ORIG_TREE="$(git rev-parse "$ORIG^{tree}")"
+ORIG_SHORT="$(git rev-parse --short "$ORIG")"
+
 # 1) 抓取上游
 git remote get-url upstream >/dev/null 2>&1 || die "未配置 upstream 远程（git remote add upstream <官方仓库>）"
 git fetch -q --tags upstream || die "fetch upstream 失败"
@@ -113,8 +118,10 @@ while IFS= read -r b; do
 done < <(find "$MAN/baseline" -type f | sort)
 info "复制新增/资产文件"
 if [ -d "$STAGE" ]; then
-  ( cd "$STAGE" && find . -path ./__man -prune -o -type f -print ) | sed 's|^\./||' | while IFS= read -r rel; do
-    case "$rel" in *__man*) continue ;; esac
+  # ★ 必须同时排除 __man（发行元数据）与 __wf（.github/workflows 暂存）：
+  #   只排除 __man 时，__wf 会被当成"新增文件"拷进仓库根 → 每轮重叠加都长出 __wf/ 垃圾目录 ✗
+  ( cd "$STAGE" && find . \( -path ./__man -o -path ./__wf \) -prune -o -type f -print ) | sed 's|^\./||' | while IFS= read -r rel; do
+    case "$rel" in *__man*|*__wf*) continue ;; esac
     if [ -f "$MAN/baseline/$rel" ]; then continue; fi   # 受控文件已由补丁处理
     mkdir -p "$(dirname "$rel")"; cp -p "$STAGE/$rel" "$rel"
   done
@@ -147,8 +154,25 @@ bash "$MAN/tools/verify-assets.sh" || die "定制校验未通过（定制未完�
 
 if [ "$DO_COMMIT" -eq 1 ]; then
   git add -A
+  # 5.7) 幂等检查：重叠加后的树与起点相同 → 不提交、不打 tag，直接还原
+  #      （force_rebuild 这类"上游无新版也跑一遍"的场景，不该在 main 上留下零实质变更的提交）
+  NEW_TREE="$(git write-tree)"
+  if [ "$NEW_TREE" = "$ORIG_TREE" ]; then
+    info "✋ 重叠加结果与当前发行树完全一致（tree ${ORIG_TREE:0:8}）"
+    info "   → 不产生提交、不打 tag、不移动基线；已还原到 $ORIG_SHORT"
+    git reset --hard "$ORIG" >/dev/null 2>&1 || die "还原到 $ORIG_SHORT 失败"
+    rm -rf "$STAGE"
+    echo "✅ 完成（上游无变化，未产生任何提交）"
+    exit 0
+  fi
   git -c user.email=ci@woloong.local -c user.name=Woloong commit -q -m "woloong: re-apply customization (upstream $UP_SHORT)" && info "已提交定制重放"
-  if [ -n "$TAG" ]; then git -c user.email=ci@woloong.local -c user.name=Woloong tag -a "$TAG" -m "发行树：上游 $UP_SHORT + woloong 定制" && info "已打 tag：$TAG"; fi
+  if [ -n "$TAG" ]; then
+    if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null 2>&1; then
+      info "  ⚠ tag $TAG 已存在（当前指向 $(git rev-parse --short "refs/tags/$TAG")），本工具不移动它；是否 tag -f 由发布步骤决定"
+    else
+      git -c user.email=ci@woloong.local -c user.name=Woloong tag -a "$TAG" -m "发行树：上游 $UP_SHORT + woloong 定制" && info "已打 tag：$TAG"
+    fi
+  fi
   info "git describe: $(git describe --always --tags --long --dirty)"
   info "工作区脏数: $(git status --porcelain | wc -l)"
 fi
